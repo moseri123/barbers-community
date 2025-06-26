@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>טופס הצטרפות - קהילת המספרות</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #fceabb, #f8b500);
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 750px;
+      margin: 50px auto;
+      background-color: #fff;
+      padding: 40px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      border: 3px solid #f39c12;
+      position: relative;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    #manualSalon {
+      display: none;
+      transition: all 0.3s ease;
+    }
+    .checkbox-inline {
+      display: flex;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .checkbox-inline input[type="checkbox"] {
+      margin-left: 8px;
+      transform: scale(1.2);
+    }
+    .option-button {
+      display: inline-block;
+      background-color: #ecf0f1;
+      border: 2px solid #ccc;
+      padding: 8px 12px;
+      margin: 5px;
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+    .option-button[aria-checked="true"] {
+      background-color: #f39c12;
+      color: white;
+      border-color: #e67e22;
+    }
+    .popup {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      max-width: 600px;
+      background-color: white;
+      border: 2px solid #e67e22;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      z-index: 1000;
+    }
+    .popup h3 {
+      color: #d35400;
+    }
+    .popup button {
+      margin-top: 15px;
+      background-color: #e67e22;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📣 הצטרפות לקהילת המספרות</h2>
+    <form id="barberForm">
+      <label for="memberId">מספר חבר:</label>
+      <input type="text" id="memberId" name="memberId" />
+
+      <div class="checkbox-inline">
+        <input type="checkbox" id="noMemberId" />
+        <label for="noMemberId">אין לי מספר חבר</label>
+      </div>
+
+      <div id="manualSalon">
+        <label for="salonName">שם המספרה:</label>
+        <input type="text" id="salonName" name="salonName" />
+      </div>
+
+      <label>תחום ההתמחות של המספרה:</label>
+      <div id="specialty-options">
+        <button type="button" class="option-button" data-value="נשים">נשים</button>
+        <button type="button" class="option-button" data-value="גברים">גברים</button>
+        <button type="button" class="option-button" data-value="ילדים">ילדים</button>
+      </div>
+      <input type="hidden" name="specialty" id="specialty-input" />
+
+      <label for="products">מוצרים רלוונטיים:</label>
+      <textarea id="products" name="products" rows="3"></textarea>
+
+      <label for="fullName">שם מלא:</label>
+      <input type="text" id="fullName" name="fullName" required />
+
+      <label for="phone">טלפון:</label>
+      <input type="tel" id="phone" name="phone" required pattern="[0-9]{10}" title="מספר בן 10 ספרות" />
+
+      <label for="email">אימייל:</label>
+      <input type="email" id="email" name="email" />
+
+      <label for="comments">הערות:</label>
+      <textarea id="comments" name="comments" rows="4"></textarea>
+
+      <label>
+        <input type="checkbox" name="terms" />
+        אני מאשר/ת את <a href="#" onclick="openPopup(); return false;">תקנון השימוש</a>
+      </label>
+
+      <button type="submit">שלח</button>
+    </form>
+  </div>
+
+  <div class="popup" id="termsPopup">
+    <h3>תקנון שימוש</h3>
+    <p>בהרשמתך, הינך מאשר לנו לשמור את פרטיך, לפנות אליך במייל, טלפון או הודעת וואטסאפ, לצרכים מקצועיים ופרסומיים, לרבות עדכונים ומבצעים הקשורים לקהילת המספרות. אנו מתחייבים שלא להעביר את פרטיך לגורם שלישי ללא רשותך.</p>
+    <button onclick="closePopup()">קראתי</button>
+  </div>
+
+  <script>
+    const URL = "https://script.google.com/macros/s/AKfycbxtEbNugHr0Ftxb8M7zYE1298B6gsuS5_lzBchG24hxgg4kK1KrrRBhA-aeJvLob01k/exec";
+
+    const memberInput = document.getElementById("memberId");
+    const salonInput = document.getElementById("salonName");
+    const noMemberBox = document.getElementById("noMemberId");
+    const manualSalonDiv = document.getElementById("manualSalon");
+    const specialtyButtons = document.querySelectorAll(".option-button");
+    const specialtyInput = document.getElementById("specialty-input");
+
+    noMemberBox.addEventListener("change", () => {
+      if (noMemberBox.checked) {
+        manualSalonDiv.style.display = "block";
+        salonInput.readOnly = false;
+        memberInput.value = "";
+      } else {
+        manualSalonDiv.style.display = "none";
+        salonInput.readOnly = true;
+        salonInput.value = "";
+      }
+    });
+
+    memberInput.addEventListener("input", () => {
+      if (!noMemberBox.checked && memberInput.value.trim() !== "") {
+        fetch(`${URL}?action=getSalonName&memberId=${memberInput.value.trim()}`)
+          .then(res => res.json())
+          .then(data => {
+            salonInput.value = data.salonName || "";
+          });
+      }
+    });
+
+    specialtyButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const selected = btn.getAttribute("aria-checked") === "true";
+        btn.setAttribute("aria-checked", !selected);
+        btn.style.backgroundColor = selected ? "#ecf0f1" : "#f39c12";
+        btn.style.color = selected ? "black" : "white";
+
+        const selectedValues = Array.from(specialtyButtons)
+          .filter(b => b.getAttribute("aria-checked") === "true")
+          .map(b => b.dataset.value);
+        specialtyInput.value = selectedValues.join(",");
+      });
+    });
+
+    document.getElementById("barberForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const params = new URLSearchParams(formData);
+
+      try {
+        const res = await fetch(URL, {
+          method: "POST",
+          body: params,
+        });
+        const text = await res.text();
+        alert("נשמר בהצלחה!");
+        e.target.reset();
+        specialtyButtons.forEach(btn => btn.setAttribute("aria-checked", "false"));
+        salonInput.value = "";
+      } catch (err) {
+        alert("שגיאה בשליחה");
+      }
+    });
+
+    function openPopup() {
+      document.getElementById("termsPopup").style.display = "block";
+    }
+
+    function closePopup() {
+      document.getElementById("termsPopup").style.display = "none";
+    }
+  </script>
+</body>
+</html>
