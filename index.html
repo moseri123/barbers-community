@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>טופס הצטרפות - קהילת המספרות</title>
   <style>
     body {
@@ -56,7 +56,11 @@
       margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 8px;
-      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+    input:not([readonly]):focus {
+      border-color: #f39c12;
+      box-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
     }
     .option-button {
       display: inline-block;
@@ -69,7 +73,6 @@
       user-select: none;
       transition: all 0.2s ease, transform 0.2s ease;
       font-size: 14px;
-      direction: rtl;
     }
     .option-button:hover {
       transform: scale(1.05);
@@ -104,8 +107,6 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.2s ease, transform 0.2s ease;
-      font-size: 14px;
-      direction: rtl;
     }
     .product-item:hover {
       transform: scale(1.05);
@@ -133,7 +134,7 @@
     .product-actions button:hover {
       background-color: #ddd;
     }
-    button[type="submit"] {
+    button[type="submit"], #confirmSalonName {
       background-color: #e67e22;
       color: white;
       border: none;
@@ -143,107 +144,39 @@
       cursor: pointer;
       transition: background-color 0.2s ease;
       display: block;
-      margin: 30px auto 0;
+      margin: 10px auto;
     }
-    button[type="submit"]:hover {
+    button[type="submit"]:hover, #confirmSalonName:hover {
       background-color: #d35400;
     }
     .note {
       font-size: 12px;
       color: #666;
       margin-top: 5px;
-      direction: rtl;
     }
     #summary {
       margin-top: 20px;
       padding: 10px;
       background-color: #f9f9f9;
       border-radius: 8px;
-      direction: rtl;
     }
     #summary h3 {
       color: #e67e22;
       font-size: 18px;
     }
-    #no-member-container {
-      margin-top: -10px;
-      margin-bottom: 20px;
-      text-align: right;
-      direction: rtl;
-    }
-    #no-member-button {
-      font-size: 13px;
-      padding: 4px 10px;
-      cursor: pointer;
-      border-radius: 12px;
-      border: 1.5px solid #f39c12;
-      background-color: #fff3e0;
+    #welcome-message {
       color: #e67e22;
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    #no-member-button:hover {
-      background-color: #f39c12;
-      color: white;
-    }
-    #manual-salon-name {
-      display: none;
-      margin-top: 8px;
-      margin-bottom: 20px;
-    }
-    #manual-salon-name input {
-      width: 100%;
-      padding: 10px;
       font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-    /* Modal styles for תקנון */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-    .modal {
-      background: white;
-      border-radius: 15px;
-      max-width: 600px;
-      max-height: 80vh;
-      overflow-y: auto;
-      padding: 25px 30px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.3);
-      direction: rtl;
-    }
-    .modal h3 {
-      margin-top: 0;
-      color: #d35400;
+      margin-top: 10px;
       text-align: center;
     }
-    .modal-content {
-      font-size: 14px;
-      color: #333;
-      line-height: 1.6;
-      margin-bottom: 25px;
+    @keyframes pulse {
+      0% { border-color: #ccc; }
+      50% { border-color: #f39c12; }
+      100% { border-color: #ccc; }
     }
-    .modal-close-btn {
-      display: block;
-      margin: 0 auto;
-      background-color: #f39c12;
-      border: none;
-      color: white;
-      padding: 12px 25px;
-      font-size: 16px;
-      border-radius: 10px;
-      cursor: pointer;
-      user-select: none;
-      transition: background-color 0.2s ease;
-    }
-    .modal-close-btn:hover {
-      background-color: #d35400;
+    .editable {
+      animation: pulse 1.5s infinite;
     }
   </style>
 </head>
@@ -254,299 +187,416 @@
       כוחנו באחדותנו, ברכתנו באמונתנו
     </div>
     <h2>📣 קהילת המספרות הרשמית של ישראל</h2>
-
     <form id="form">
       <label>מספר חבר:</label>
-      <input type="text" name="memberId" id="memberId" autocomplete="off" />
-
-      <div id="no-member-container">
-        <button type="button" id="no-member-button">אין לי מספר חבר</button>
-      </div>
-
+      <input type="text" name="memberId" id="memberId">
+      <label>
+        <input type="checkbox" id="noMemberId" name="noMemberId">
+        אין לי מספר חבר עדיין, ואשמח לאחד כזה
+      </label>
+      <div id="welcome-message"></div>
       <label>שם המספרה:</label>
-      <input type="text" name="salonName" id="salonName" readonly autocomplete="off" />
-
-      <div id="manual-salon-name">
-        <label>אנא הזן שם מספרה ידנית:</label>
-        <input type="text" id="manualSalonNameInput" autocomplete="off" />
-      </div>
-
+      <input type="text" name="salonName" id="salonName" readonly>
+      <button type="button" id="confirmSalonName" style="display: none;">אישור</button>
       <label>תחום ההתמחות של המספרה:</label>
       <div id="specialty-options">
-        <button class="option-button" type="button" role="checkbox" aria-checked="false" data-value="נשים">נשים</button>
-        <button class="option-button" type="button" role="checkbox" aria-checked="false" data-value="גברים">גברים</button>
-        <button class="option-button" type="button" role="checkbox" aria-checked="false" data-value="ילדים">ילדים</button>
+        <button class="option-button" role="checkbox" aria-checked="false" data-value="נשים">נשים</button>
+        <button class="option-button" role="checkbox" aria-checked="false" data-value="גברים">גברים</button>
+        <button class="option-button" role="checkbox" aria-checked="false" data-value="ילדים">ילדים</button>
       </div>
-      <div class="note">(ניתן לבחור יותר מאחד)</div>
-
-      <input type="hidden" name="specialty" id="specialty-input" />
-      <input type="hidden" name="services" id="services-input" />
-      <input type="hidden" name="products" id="products-input" />
-
+      <div class="note">(בחירה מרובה)</div>
+      <input type="hidden" name="specialty" id="specialty-input">
+      <input type="hidden" name="services" id="services-input">
+      <input type="hidden" name="products" id="products-input">
       <div id="services-container"></div>
-
-      <div id="products-container" style="display:none;">
+      <div id="products-container">
         <label class="section-title">מוצרים רלוונטיים:</label>
         <div id="productList" class="product-list"></div>
       </div>
-
       <label>שם מלא:</label>
-      <input type="text" name="fullName" required autocomplete="off" />
-
+      <input type="text" name="fullName" required>
       <label>מספר טלפון (כולל וואטסאפ):</label>
-      <input type="tel" name="phone" required pattern="[0-9]{10}" title="נא להזין מספר טלפון תקין בן 10 ספרות" autocomplete="off" />
-
+      <input type="tel" name="phone" required pattern="[0-9]{10}" title="נא להזין מספר טלפון תקין בן 10 ספרות">
       <label>כתובת מייל:</label>
-      <input type="email" name="email" autocomplete="off" />
-
+      <input type="email" name="email">
       <label>במידה ויש משהו נוסף, הצעות או בקשות כלשהן כתוב כאן:</label>
       <textarea name="comments" rows="4"></textarea>
-
       <label>
-        <input type="checkbox" name="terms" id="termsCheckbox" required />
-        אני מאשר/ת את <a href="#" id="openTerms">תקנון השימוש</a>
+        <input type="checkbox" name="terms" required>
+        אני מאשר/ת את <a href="https://example.com/terms" target="_blank">תקנון השימוש</a>
       </label>
-
       <button type="submit">שלח</button>
     </form>
-
-    <div id="summary" style="display:none;">
+    <div id="summary" style="display: none;">
       <h3>סיכום הבחירות:</h3>
-      <p><strong>תחום התמחות:</strong> <span id="summary-specialty">ללא</span></p>
+      <p><strong>התמחויות:</strong> <span id="summary-specialty">ללא</span></p>
       <p><strong>שירותים:</strong> <span id="summary-services">ללא</span></p>
       <p><strong>מוצרים:</strong> <span id="summary-products">ללא</span></p>
       <p><strong>הערות:</strong> <span id="summary-comments">ללא</span></p>
     </div>
   </div>
-
-  <!-- Modal for Terms -->
-  <div class="modal-overlay" id="termsModal">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
-      <h3 id="termsTitle">תקנון השימוש</h3>
-      <div class="modal-content">
-        <p>ברוכים הבאים לטופס ההצטרפות שלנו. אנא קראו את התקנון הבא בקפידה לפני שאתם ממשיכים:</p>
-        <ul>
-          <li>הנתונים שאתם מזינים ישמרו בגליון Google Sheets באופן מאובטח וישמשו ליצירת קשר, מתן שירות, והשתלבות בקהילה.</li>
-          <li>המידע ייעשה בו שימוש גם לצורכי פרסום מוצרים ושירותים בלבד עם אישורכם.</li>
-          <li>אנו מתחייבים שלא להעביר את המידע לצדדים שלישיים ללא אישור מפורש.</li>
-          <li>ניתן לפנות אלינו בכל עת למחיקת הנתונים או בקשות פרטיות נוספות.</li>
-          <li>על ידי אישורכם, אתם מסכימים לקבל תקשורת דרך מייל, וואטסאפ או טלפון.</li>
-          <li>שימושכם בטופס מהווה הסכמה מלאה לתנאי התקנון.</li>
-        </ul>
-        <p>לכל שאלה או בעיה ניתן לפנות למנהל הקהילה.</p>
-      </div>
-      <button class="modal-close-btn" id="closeTermsBtn">קראתי ואישרתי</button>
-    </div>
-  </div>
-
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtEbNugHr0Ftxb8M7zYE1298B6gsuS5_lzBchG24hxgg4kK1KrrRBhA-aeJvLob01k/exec';
-
-    const memberIdInput = document.getElementById('memberId');
-    const salonNameInput = document.getElementById('salonName');
-    const manualSalonNameContainer = document.getElementById('manual-salon-name');
-    const manualSalonNameInput = document.getElementById('manualSalonNameInput');
-    const noMemberBtn = document.getElementById('no-member-button');
-
-    const specialtyButtons = document.querySelectorAll('#specialty-options .option-button');
-    const specialtyInput = document.getElementById('specialty-input');
-
-    const form = document.getElementById('form');
-
-    const summary = document.getElementById('summary');
-    const summarySpecialty = document.getElementById('summary-specialty');
-    const summaryServices = document.getElementById('summary-services');
-    const summaryProducts = document.getElementById('summary-products');
-    const summaryComments = document.getElementById('summary-comments');
-
-    // To store selected specialty values
-    let selectedSpecialties = [];
-
-    // Toggle specialty button selection
-    specialtyButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const isChecked = btn.getAttribute('aria-checked') === 'true';
-        if (isChecked) {
-          btn.setAttribute('aria-checked', 'false');
-          selectedSpecialties = selectedSpecialties.filter(s => s !== btn.dataset.value);
-        } else {
-          btn.setAttribute('aria-checked', 'true');
-          selectedSpecialties.push(btn.dataset.value);
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxtEbNugHr0Ftxb8M7zYE1298B6gsuS5_lzBchG24hxgg4kK1KrrRBhA-aeJvLob01k/exec';
+    document.addEventListener("DOMContentLoaded", function () {
+      const specialtyOptions = document.querySelectorAll('#specialty-options .option-button');
+      const specialtyInput = document.getElementById('specialty-input');
+      const servicesContainer = document.getElementById('services-container');
+      const productList = document.getElementById('productList');
+      const servicesInput = document.getElementById('services-input');
+      const productsInput = document.getElementById('products-input');
+      const form = document.getElementById('form');
+      const memberIdInput = document.getElementById('memberId');
+      const salonNameInput = document.getElementById('salonName');
+      const noMemberIdCheckbox = document.getElementById('noMemberId');
+      const confirmSalonNameButton = document.getElementById('confirmSalonName');
+      const welcomeMessageDiv = document.getElementById('welcome-message');
+      const services = {
+        'נשים': ['תספורות', 'צביעת שיער', 'הבהרות וגוונים', 'החלקות', 'תוספות שיער', 'תסרוקות', 'טיפולי שיקום לשיער פגום', 'טיפולי קראטין', 'טיפולי בוטוקס לשיער', 'מכירת מוצרי שיער', 'פתיחת תלתלים', 'מכירת מוצרים חשמליים'],
+        'גברים': ['תספורות', 'עיצוב וסידור זקן', 'גילוח עם קצף', 'החלקות שיער', 'צביעת שיער', 'טיפולי פנים לגברים', 'הסרת שיער בלייזר או שעווה', 'מכירת מוצרי טיפוח לגבר', 'מכירת מוצרים חשמליים'],
+        'ילדים': ['תספורת ראשונה', 'תספורות עם עיצובי דמויות', 'חוויית תספורת מותאמת', 'סבלנות והתאמה לגיל הרך', 'תספורות לאירועים מיוחדים', 'צמות', 'תוספות שיער לילדים']
+      };
+      const productsMap = {
+        'תספורות': ['מספריים', 'מכונת תספורת', 'מסרקים'],
+        'צביעת שיער': ['צבעים', 'מברשות ערבוב', 'כפפות'],
+        'הבהרות וגוונים': ['חמצן', 'נייר כסף', 'מברשות'],
+        'החלקות': ['חומרי החלקה', 'מחליק שיער'],
+        'תוספות שיער': ['שיער להלחמה', 'דבק או חרוזים'],
+        'תסרוקות': ['ספריי לשיער', 'מסרק חד'],
+        'עיצוב וסידור זקן': ['שמן לזקן', 'מברשת'],
+        'גילוח עם קצף': ['קצף גילוח', 'סכין'],
+        'טיפולי פנים לגברים': ['מסכה', 'מגבונים'],
+        'הסרת שיער בלייזר או שעווה': ['שעווה', 'מקלות מריחה'],
+        'טיפולי שיקום לשיער פגום': ['מסכה מזינה', 'שמן ארגן'],
+        'טיפולי קראטין': ['קראטין', 'מברשת'],
+        'טיפולי בוטוקס לשיער': ['בוטוקס לשיער'],
+        'פתיחת תלתלים': ['מסרק רחב', 'קרם פתיחה'],
+        'מכירת מוצרי שיער': ['שמפו', 'מסכה', 'סרום'],
+        'מכירת מוצרים חשמליים': ['פן', 'מחליק', 'מכונת תספורת'],
+        'תספורת ראשונה': ['מספריים קטנים', 'מסרק עדין'],
+        'תספורות עם עיצובי דמויות': ['שבלונות', 'ג׳ל צבעוני'],
+        'חוויית תספורת מותאמת': ['סרטי ילדים', 'כיסא מיוחד'],
+        'סבלנות והתאמה לגיל הרך': ['צעצועים קטנים'],
+        'תספורות לאירועים מיוחדים': ['ג׳ל', 'אביזרים'],
+        'צמות': ['גומיות צבעוניות'],
+        'תוספות שיער לילדים': ['תוספות צבעוניות']
+      };
+      let selectedServices = new Set();
+      let selectedProducts = new Set();
+      async function fetchSalonName(memberId) {
+        try {
+          const response = await fetch(`${WEB_APP_URL}?action=getSalonName&memberId=${encodeURIComponent(memberId)}`);
+          const data = await response.json();
+          if (data.error) {
+            throw new Error(data.error);
+          }
+          return data.salonName || '';
+        } catch (error) {
+          console.error('Error fetching salon name:', error);
+          alert('שגיאה בשליפת שם המספרה: ' + error.message);
+          return '';
         }
-        specialtyInput.value = selectedSpecialties.join(', ');
-        updateSummary();
-      });
-    });
-
-    // Handle "אין לי מספר חבר" button
-    noMemberBtn.addEventListener('click', () => {
-      memberIdInput.value = '';
-      memberIdInput.disabled = true;
-      salonNameInput.value = '';
-      salonNameInput.readOnly = true;
-      manualSalonNameContainer.style.display = 'block';
-      manualSalonNameInput.required = true;
-      noMemberBtn.style.display = 'none';
-      fetchServicesBySalonName(null); // Clear services/products
-      updateSummary();
-    });
-
-    // If user edits memberId manually, enable inputs again and hide manual salon name
-    memberIdInput.addEventListener('input', () => {
-      if (memberIdInput.value.trim() !== '') {
-        memberIdInput.disabled = false;
-        manualSalonNameContainer.style.display = 'none';
-        manualSalonNameInput.required = false;
-        noMemberBtn.style.display = 'inline-block';
-        fetchSalonDataByMemberId(memberIdInput.value.trim());
-      } else {
-        salonNameInput.value = '';
-        fetchServicesBySalonName(null);
-        updateSummary();
       }
-    });
-
-    manualSalonNameInput.addEventListener('input', () => {
-      updateSummary();
-    });
-
-    // Fetch salon name and other data by member ID (מספר חבר)
-    async function fetchSalonDataByMemberId(memberId) {
-      if (!memberId) {
-        salonNameInput.value = '';
-        fetchServicesBySalonName(null);
-        return;
+      async function createNewMemberId(salonName) {
+        try {
+          const response = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'createNewMemberId', salonName }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const data = await response.json();
+          if (data.error) {
+            throw new Error(data.error);
+          }
+          return data.memberId;
+        } catch (error) {
+          console.error('Error creating new member ID:', error);
+          alert('שגיאה ביצירת מספר חבר חדש: ' + error.message);
+          return '';
+        }
       }
-      try {
-        const url = `${SCRIPT_URL}?action=getByMemberId&memberId=${encodeURIComponent(memberId)}`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Error fetching data');
-        const data = await response.json();
-        if (data && data.length > 0) {
-          const record = data[0];
-          // לפי ההנחה שלך: 
-          // record[1] = מספר עסק, record[2] = תחום התמחות, record[3] = מוצרים רלוונטיים ...
-          // שים פה את מיפוי הנתונים בהתאם למבנה הגיליון שלך
-          salonNameInput.value = record[1] || '';
-          // גם אפשר לעדכן תחום התמחות / מוצרים כאן אם תרצה
-          fetchServicesBySalonName(salonNameInput.value);
+      async function submitFormData(data) {
+        try {
+          const response = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const result = await response.text();
+          if (result === 'Success') {
+            return true;
+          } else {
+            throw new Error(result);
+          }
+        } catch (error) {
+          console.error('Error submitting form data:', error);
+          throw error;
+        }
+      }
+      noMemberIdCheckbox.addEventListener('change', function() {
+        welcomeMessageDiv.textContent = '';
+        if (this.checked) {
+          memberIdInput.value = '';
+          memberIdInput.disabled = true;
+          salonNameInput.removeAttribute('readonly');
+          salonNameInput.classList.add('editable');
+          confirmSalonNameButton.style.display = 'block';
         } else {
+          memberIdInput.disabled = false;
+          salonNameInput.setAttribute('readonly', 'true');
+          salonNameInput.classList.remove('editable');
           salonNameInput.value = '';
-          fetchServicesBySalonName(null);
+          confirmSalonNameButton.style.display = 'none';
         }
-        updateSummary();
-      } catch (error) {
-        console.error(error);
-        salonNameInput.value = '';
-        fetchServicesBySalonName(null);
-      }
-    }
-
-    // מחזיר רשימת שירותים ומוצרים לפי שם העסק (מספרה)
-    // כאן תוסיף את הקוד שלך לשליפת שירותים ומוצרים (אם קיימים)
-    // או לרוקן אותם במקרה שאין מספרה
-    function fetchServicesBySalonName(salonName) {
-      // לדוגמה פשוט רוקן הכל
-      // אפשר להוסיף לוגיקה לשליפת שירותים ומוצרים מגוגל שיטס לפי שם העסק
-      // כרגע נשאיר ריק ונעדכן סיכום
-      updateSummary();
-    }
-
-    // עדכון סיכום בחירות בטופס
-    function updateSummary() {
-      summary.style.display = 'block';
-      summarySpecialty.textContent = selectedSpecialties.length ? selectedSpecialties.join(', ') : 'ללא';
-      // כאן אפשר להכניס סיכום שירותים ומוצרים אם תוסיף לוגיקה
-      summaryServices.textContent = 'ללא'; 
-      summaryProducts.textContent = 'ללא';
-      summaryComments.textContent = form.comments.value.trim() || 'ללא';
-    }
-
-    // טיפול בשליחת הטופס
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      // אם משתמש בחר "אין לי מספר חבר" - קח את שם המספרה ידנית
-      let memberId = memberIdInput.value.trim();
-      let salonName = salonNameInput.value.trim();
-      if (memberId === '') {
-        salonName = manualSalonNameInput.value.trim();
+      });
+      confirmSalonNameButton.addEventListener('click', async function() {
+        const salonName = salonNameInput.value.trim();
         if (!salonName) {
-          alert('אנא הזן שם מספרה');
+          alert('נא להזין שם מספרה תקין');
           return;
         }
-      }
-
-      // השלם שדות נסתרים
-      specialtyInput.value = selectedSpecialties.join(', ');
-
-      // לוקח את השירותים והמוצרים (אם הוספת לוגיקה)
-
-      // בנה אובייקט נתונים למשלוח
-      const dataToSend = {
-        memberId,
-        salonName,
-        specialty: specialtyInput.value,
-        fullName: form.fullName.value.trim(),
-        phone: form.phone.value.trim(),
-        email: form.email.value.trim(),
-        comments: form.comments.value.trim(),
-        date: new Date().toLocaleDateString('he-IL'),
-        // services ומוצרים אם תוסיף לוגיקה תשלח כאן
-      };
-
-      // קריאה ל-API של Google Apps Script לשמירה
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify(dataToSend),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        const result = await response.json();
-        if (result.result === 'success') {
-          alert('הנתונים נשמרו בהצלחה. תודה שהצטרפת לקהילה!');
-          form.reset();
-          salonNameInput.value = '';
-          manualSalonNameContainer.style.display = 'none';
-          manualSalonNameInput.value = '';
-          memberIdInput.disabled = false;
-          noMemberBtn.style.display = 'inline-block';
-          selectedSpecialties = [];
-          specialtyButtons.forEach(b => b.setAttribute('aria-checked', 'false'));
-          updateSummary();
-        } else {
-          alert('אירעה שגיאה בשמירת הנתונים. נסה שנית מאוחר יותר.');
+        const newMemberId = await createNewMemberId(salonName);
+        if (newMemberId) {
+          memberIdInput.value = newMemberId;
+          memberIdInput.disabled = true;
+          salonNameInput.setAttribute('readonly', 'true');
+          salonNameInput.classList.remove('editable');
+          confirmSalonNameButton.style.display = 'none';
+          welcomeMessageDiv.textContent = `מזל טוב! מספר החבר החדש שלך הוא ${newMemberId}. אנא שמור מספר זה לשימוש עתידי בקהילת המספרות הרשמית של ישראל. תודה על הצטרפותך!`;
         }
-      } catch (error) {
-        console.error(error);
-        alert('אירעה שגיאה בשמירת הנתונים. אנא נסה שוב.');
+      });
+      memberIdInput.addEventListener('input', async function() {
+        if (noMemberIdCheckbox.checked) return;
+        const memberId = this.value.trim();
+        welcomeMessageDiv.textContent = '';
+        if (memberId) {
+          const salonName = await fetchSalonName(memberId);
+          salonNameInput.value = salonName;
+          if (salonName) {
+            welcomeMessageDiv.textContent = `שלום, ${salonName}, תודה על השיתוף פעולה שלך בקהילה!`;
+          } else {
+            welcomeMessageDiv.textContent = 'מספר חבר לא נמצא.';
+          }
+        } else {
+          salonNameInput.value = '';
+        }
+      });
+      const savedForm = localStorage.getItem('formState');
+      if (savedForm) {
+        const formData = JSON.parse(savedForm);
+        document.querySelector('input[name="memberId"]').value = formData.memberId || '';
+        document.querySelector('input[name="salonName"]').value = formData.salonName || '';
+        document.querySelector('input[name="fullName"]').value = formData.fullName || '';
+        document.querySelector('input[name="phone"]').value = formData.phone || '';
+        document.querySelector('input[name="email"]').value = formData.email || '';
+        document.querySelector('textarea[name="comments"]').value = formData.comments || '';
+        document.querySelector('input[name="noMemberId"]').checked = formData.noMemberId || false;
+        if (formData.noMemberId) {
+          memberIdInput.disabled = true;
+          salonNameInput.removeAttribute('readonly');
+          salonNameInput.classList.add('editable');
+          confirmSalonNameButton.style.display = 'block';
+        }
+        if (formData.specialty) {
+          formData.specialty.split(',').forEach(value => {
+            const button = document.querySelector(`.option-button[data-value="${value}"]`);
+            if (button) {
+              button.setAttribute('aria-checked', 'true');
+            }
+          });
+          specialtyInput.value = formData.specialty;
+          if (formData.services) {
+            selectedServices = new Set(formData.services.split(','));
+            servicesInput.value = formData.services;
+          }
+          if (formData.products) {
+            selectedProducts = new Set(formData.products.split(','));
+            productsInput.value = formData.products;
+          }
+          renderServiceSections(formData.specialty.split(','));
+        }
+      }
+      specialtyOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          const isChecked = option.getAttribute('aria-checked') === 'true';
+          option.setAttribute('aria-checked', !isChecked);
+          const selected = Array.from(specialtyOptions)
+            .filter(opt => opt.getAttribute('aria-checked') === 'true')
+            .map(opt => opt.dataset.value);
+          specialtyInput.value = selected.join(',');
+          renderServiceSections(selected);
+          updateSummary();
+        });
+      });
+      form.addEventListener('input', function() {
+        const formData = Object.fromEntries(new FormData(this));
+        localStorage.setItem('formState', JSON.stringify(formData));
+        updateSummary();
+      });
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const phoneInput = document.querySelector('input[name="phone"]');
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!phoneInput.value.match(phoneRegex)) {
+          alert('נא להזין מספר טלפון תקין בן 10 ספרות');
+          return;
+        }
+        if (noMemberIdCheckbox.checked && !memberIdInput.value) {
+          alert('נא לאשר את שם המספרה ליצירת מספר חבר חדש');
+          return;
+        }
+        const formData = Object.fromEntries(new FormData(this));
+        const data = {
+          memberId: formData.memberId || '',
+          salonName: formData.salonName || '',
+          newMember: noMemberIdCheckbox.checked ? 'true' : 'false',
+          specialty: formData.specialty || '',
+          services: formData.services || '',
+          products: formData.products || '',
+          fullName: formData.fullName || '',
+          phone: formData.phone || '',
+          email: formData.email || '',
+          comments: formData.comments || ''
+        };
+        ['נשים', 'גברים', 'ילדים'].forEach(specialty => {
+          data[`התמחות: ${specialty}`] = formData.specialty.includes(specialty) ? 'כן' : 'לא';
+        });
+        Object.values(services).flat().forEach(service => {
+          data[`שירות: ${service}`] = selectedServices.has(service) ? 'כן' : 'לא';
+        });
+        Object.values(productsMap).flat().forEach(product => {
+          data[`מוצר: ${product}`] = selectedProducts.has(product) ? 'כן' : 'לא';
+        });
+        try {
+          const success = await submitFormData(data);
+          if (success) {
+            alert('הטופס נשלח בהצלחה והנתונים נשמרו ב-Google Sheets!');
+            resetForm();
+          }
+        } catch (error) {
+          alert('שגיאה בשליחת הטופס: ' + error.message);
+        }
+        function resetForm() {
+          form.reset();
+          localStorage.removeItem('formState');
+          document.querySelectorAll('.option-button, .product-item').forEach(el => el.setAttribute('aria-checked', 'false'));
+          servicesContainer.innerHTML = '';
+          productList.innerHTML = '';
+          selectedServices.clear();
+          selectedProducts.clear();
+          servicesInput.value = '';
+          productsInput.value = '';
+          specialtyInput.value = '';
+          salonNameInput.setAttribute('readonly', 'true');
+          salonNameInput.classList.remove('editable');
+          noMemberIdCheckbox.checked = false;
+          memberIdInput.disabled = false;
+          confirmSalonNameButton.style.display = 'none';
+          welcomeMessageDiv.textContent = '';
+          updateSummary();
+        }
+      });
+      function renderServiceSections(selectedSpecialties) {
+        servicesContainer.innerHTML = '';
+        selectedSpecialties.forEach(specialty => {
+          const title = document.createElement('div');
+          title.className = 'section-title';
+          title.textContent = specialty;
+          const section = document.createElement('div');
+          section.className = 'service-section';
+          section.appendChild(title);
+          services[specialty].forEach(service => {
+            const btn = document.createElement('button');
+            btn.className = 'option-button';
+            btn.setAttribute('role', 'checkbox');
+            btn.setAttribute('aria-checked', selectedServices.has(service) ? 'true' : 'false');
+            btn.textContent = service;
+            btn.dataset.service = service;
+            btn.addEventListener('click', () => {
+              const isChecked = btn.getAttribute('aria-checked') === 'true';
+              btn.setAttribute('aria-checked', !isChecked);
+              if (!isChecked) {
+                selectedServices.add(service);
+              } else {
+                selectedServices.delete(service);
+              }
+              servicesInput.value = Array.from(selectedServices).join(',');
+              renderProductList(selectedSpecialties);
+              updateSummary();
+            });
+            section.appendChild(btn);
+          });
+          servicesContainer.appendChild(section);
+        });
+        renderProductList(selectedSpecialties);
+      }
+      function renderProductList(selectedSpecialties) {
+        productList.innerHTML = '';
+        if (selectedServices.size === 0) return;
+        const actionDiv = document.createElement('div');
+        actionDiv.className = 'product-actions';
+        const selectAllBtn = document.createElement('button');
+        selectAllBtn.textContent = 'בחר הכל';
+        selectAllBtn.addEventListener('click', () => {
+          document.querySelectorAll('#productList .product-item[aria-checked="false"]').forEach(item => item.click());
+        });
+        const clearAllBtn = document.createElement('button');
+        clearAllBtn.textContent = 'נקה הכל';
+        clearAllBtn.addEventListener('click', () => {
+          document.querySelectorAll('#productList .product-item[aria-checked="true"]').forEach(item => item.click());
+        });
+        actionDiv.appendChild(selectAllBtn);
+        actionDiv.appendChild(clearAllBtn);
+        productList.appendChild(actionDiv);
+        selectedSpecialties.forEach(specialty => {
+          const specialtySection = document.createElement('div');
+          specialtySection.className = 'product-section';
+          const specialtyTitle = document.createElement('div');
+          specialtyTitle.className = 'section-title';
+          specialtyTitle.textContent = `מוצרים עבור ${specialty}`;
+          specialtySection.appendChild(specialtyTitle);
+          const relevantServices = services[specialty].filter(s => selectedServices.has(s));
+          relevantServices.forEach(service => {
+            const serviceTitle = document.createElement('div');
+            serviceTitle.className = 'note';
+            serviceTitle.textContent = service;
+            specialtySection.appendChild(serviceTitle);
+            const items = productsMap[service] || [];
+            items.forEach(item => {
+              const div = document.createElement('button');
+              div.className = 'product-item';
+              div.setAttribute('role', 'checkbox');
+              div.setAttribute('aria-checked', selectedProducts.has(item) ? 'true' : 'false');
+              div.textContent = item;
+              div.dataset.item = item;
+              div.addEventListener('click', () => {
+                const isChecked = div.getAttribute('aria-checked') === 'true';
+                if (isChecked) {
+                  selectedProducts.delete(item);
+                  div.setAttribute('aria-checked', 'false');
+                } else {
+                  selectedProducts.add(item);
+                  div.setAttribute('aria-checked', 'true');
+                }
+                productsInput.value = Array.from(selectedProducts).join(',');
+                updateSummary();
+              });
+              specialtySection.appendChild(div);
+            });
+          });
+          if (relevantServices.length > 0) {
+            productList.appendChild(specialtySection);
+          }
+        });
+      }
+      function updateSummary() {
+        const summaryDiv = document.getElementById('summary');
+        summaryDiv.style.display = 'block';
+        document.getElementById('summary-specialty').textContent = specialtyInput.value || 'ללא';
+        document.getElementById('summary-services').textContent = servicesInput.value || 'ללא';
+        document.getElementById('summary-products').textContent = productsInput.value || 'ללא';
+        document.getElementById('summary-comments').textContent = document.querySelector('textarea[name="comments"]').value || 'ללא';
       }
     });
-
-    // תקנון - פתיחה וסגירה
-    const openTermsBtn = document.getElementById('openTerms');
-    const termsModal = document.getElementById('termsModal');
-    const closeTermsBtn = document.getElementById('closeTermsBtn');
-    const termsCheckbox = document.getElementById('termsCheckbox');
-
-    openTermsBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      termsModal.style.display = 'flex';
-    });
-    closeTermsBtn.addEventListener('click', () => {
-      termsModal.style.display = 'none';
-      termsCheckbox.checked = true;
-    });
-    termsModal.addEventListener('click', (e) => {
-      if (e.target === termsModal) {
-        termsModal.style.display = 'none';
-      }
-    });
-
-    // התחלת עדכון הסיכום כבר עכשיו
-    updateSummary();
   </script>
 </body>
 </html>
